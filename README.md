@@ -3,7 +3,7 @@
 DemoApp
 
 A modern dashboard built with Next.js, Tailwind CSS, and shadcn/ui.
-It includes onboarding workflows, broker overview, AI assistant toggle, and Cypress integration tests.
+It includes onboarding workflows, broker overview, and Cypress integration tests.
 
 Features
 
