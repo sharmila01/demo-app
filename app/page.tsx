@@ -1,9 +1,9 @@
 "use client";
 
 import Layout from "./components/layout/Layout";
-import BorrowerPipeline from "./components/pipeline/BorrowerPipeline";
-import BorrowerDetail from "./components/details/BorrowerDetail";
-import BrokerOverview from "./components/broker/BrokerOverview";
+import BorrowerPipeline from "./components/BorrowerPipeline";
+import BorrowerDetail from "./components/BorrowerDetail";
+import BrokerOverview from "./components/BrokerOverview";
 
 export default function Home() {
   return (

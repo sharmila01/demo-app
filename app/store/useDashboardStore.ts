@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { Borrower } from "../types/borrower";
 
+export interface OnboardingStep {
+  name: string;
+  completed: boolean;
+}
+
 interface DashboardState {
   activeBorrower: Borrower | null;
   setActiveBorrower: (b: Borrower) => void;
@@ -21,17 +26,20 @@ interface DashboardState {
     pending: number;
   }) => void;
 
-  onboardingSteps: string[];
-  setOnboardingSteps: (steps: string[]) => void;
+  onboardingSteps: OnboardingStep[];
+  setOnboardingSteps: (steps: OnboardingStep[]) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
   activeBorrower: null,
   setActiveBorrower: (b) => set({ activeBorrower: b }),
+
   borrowerDetails: null,
   setBorrowerDetails: (b) => set({ borrowerDetails: b }),
+
   broker: null,
   setBroker: (b) => set({ broker: b }),
+
   onboardingSteps: [],
   setOnboardingSteps: (steps) => set({ onboardingSteps: steps }),
 }));

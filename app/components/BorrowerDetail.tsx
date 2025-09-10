@@ -7,7 +7,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@radix-ui/react-accordion";
+} from "@/app/components/ui/accordion";
+import { Button } from "@/app/components/ui/button";
 import { fetcher } from "@/app/utils/api";
 import { useDashboardStore } from "@/app/store/useDashboardStore";
 import { Borrower } from "@/app/types/borrower";
@@ -51,6 +52,7 @@ export default function BorrowerDetail() {
     );
 
   const details = borrowerDetails;
+  const canEscalate = !!details.risk_signal; // Escalate only if risk_signal exists
 
   return (
     <div
@@ -67,23 +69,23 @@ export default function BorrowerDetail() {
             {details.name}
           </h2>
           <p data-cy="borrower-email" className="text-gray-500">
-            {details.email}
+            {details.email ?? "N/A"}
           </p>
           <p data-cy="borrower-phone" className="text-gray-500">
-            {details.phone}
+            {details.phone ?? "N/A"}
           </p>
           <p
             data-cy="borrower-loan"
             className="text-gray-700 font-semibold mt-1"
           >
-            Loan: ${details.loan_amount?.toLocaleString() ?? 0}
+            Loan: ${details.loan_amount?.toLocaleString() ?? "0"}
           </p>
         </div>
         <div
           data-cy="borrower-status"
           className="px-3 py-1 rounded-full text-sm font-semibold text-white bg-blue-600"
         >
-          {details.status}
+          {details.status ?? "N/A"}
         </div>
       </div>
 
@@ -92,47 +94,53 @@ export default function BorrowerDetail() {
         <AccordionItem value="ai-flags" data-cy="ai-accordion">
           <AccordionTrigger>AI Explainability</AccordionTrigger>
           <AccordionContent className="space-y-2">
-            {details.ai_flags?.map((flag, idx) => (
-              <div
-                key={idx}
-                data-cy="ai-flag"
-                className="flex items-center gap-2 text-red-600 font-medium"
-              >
-                <AlertTriangle size={20} />
-                {flag}
-              </div>
-            ))}
+            {details.ai_flags?.length ? (
+              details.ai_flags.map((flag, idx) => (
+                <div
+                  key={idx}
+                  data-cy="ai-flag"
+                  className="flex items-center gap-2 text-red-600 font-medium"
+                >
+                  <AlertTriangle size={20} /> {flag}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No AI flags</p>
+            )}
           </AccordionContent>
         </AccordionItem>
       </Accordion>
 
       {/* Action Buttons */}
       <div className="flex gap-2 flex-wrap">
-        <button
+        <Button
           data-cy="btn-request-documents"
-          className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          variant="default"
+          className="flex items-center gap-1"
           onClick={() =>
             details.id && postAction(details.id, "request-documents")
           }
         >
           <FileText size={16} /> Request Documents
-        </button>
+        </Button>
 
-        <button
+        <Button
           data-cy="btn-send-valuer"
-          className="flex items-center gap-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+          variant="outline"
+          className="flex items-center gap-1"
           onClick={() => details.id && postAction(details.id, "send-valuer")}
         >
           <Send size={16} /> Send to Valuer
-        </button>
+        </Button>
 
-        <button
+        <Button
           data-cy="btn-approve"
-          className="flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          variant="default"
+          className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white"
           onClick={() => details.id && postAction(details.id, "approve")}
         >
           <UserCheck size={16} /> Approve
-        </button>
+        </Button>
       </div>
 
       {/* Loan Summary */}
@@ -140,19 +148,19 @@ export default function BorrowerDetail() {
         <div className="grid grid-cols-2 gap-4">
           <div className="text-gray-500">
             <span className="font-semibold">Employment:</span>{" "}
-            {details.employment || "N/A"}
+            {details.employment ?? "N/A"}
           </div>
           <div className="text-gray-500">
             <span className="font-semibold">Existing Loan:</span> $
-            {details.existing_loan?.toLocaleString() || "0"}
+            {details.existing_loan?.toLocaleString() ?? "0"}
           </div>
           <div className="text-gray-500">
             <span className="font-semibold">Credit Score:</span>{" "}
-            {details.credit_score || "N/A"}
+            {details.credit_score?.toString() ?? "N/A"}
           </div>
           <div className="text-gray-500">
             <span className="font-semibold">Source of Funds:</span>{" "}
-            {details.source_of_funds || "N/A"}
+            {details.source_of_funds ?? "N/A"}
           </div>
         </div>
 
@@ -165,13 +173,22 @@ export default function BorrowerDetail() {
           </div>
         )}
 
-        <button
+        {/* Escalate Button */}
+        <Button
           data-cy="btn-escalate"
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          variant="destructive"
+          disabled={!canEscalate}
+          className="bg-purple text-black p-2 rounded mt-2"
           onClick={() => details.id && postAction(details.id, "escalate")}
         >
           Escalate to Credit Committee
-        </button>
+        </Button>
+
+        {!canEscalate && (
+          <p className="text-xs text-gray-500 mt-1">
+            Cannot escalate: No risk signal present
+          </p>
+        )}
       </div>
     </div>
   );

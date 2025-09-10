@@ -1,4 +1,3 @@
-// types/borrower.ts
 export interface Borrower {
   id: string;
   name: string;
